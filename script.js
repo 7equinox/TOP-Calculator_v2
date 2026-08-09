@@ -16,7 +16,14 @@ function multiply(multiplicand, multiplier) {
 }
 
 function divide(dividend, divisor) {
-    return dividend / divisor;
+    const quotient = dividend / divisor;
+
+    if(quotient === Infinity
+        || quotient === -Infinity
+        || Number.isNaN(quotient)) {
+        return "undefined";
+    }
+    return quotient;
 }
 
 function operate(num1, operator, num2) {
@@ -43,9 +50,15 @@ function getFinalValue(num1, operator, num2) {
     const calcAns = operate(num1, operator, num2);
 
     // Round answer to not overflow the display
-    if(!hasAtMostTwoDecimals(calcAns)) {
+    if(calcAns !== "undefined" && !hasAtMostTwoDecimals(calcAns)) {
         return parseFloat(calcAns.toFixed(2));
     }
+
+    // Remind if divisor is zero
+    if(calcAns === "undefined") {
+        alert("Division by zero is undefined");
+    }
+
     return calcAns;
 }
 
@@ -76,6 +89,11 @@ objBtns.forEach(objBtn => {
     objBtn.addEventListener('click', (event) => {
         const charInput = objBtn.textContent;
 
+        // Avoid NaN immediately
+        if(objResult.textContent === 'undefined') {
+            objResult.textContent = '';
+        }
+
         switch(charInput) {
             // Clear button
             case 'C':
@@ -83,13 +101,23 @@ objBtns.forEach(objBtn => {
                 boolHasOp = false;
                 break;
             case '=':
-                // Invalid 2nd input num '.'
+                // Invalid 1st or 2nd input num '.'
                 if(objResult.textContent.at(-1) === '.') {
                     break;
                 }
 
+                // Invalid unary op
+                if(/^[+-]?$/.test(objResult.textContent)) {
+                    break;
+                }
+
+                // Invalid inputs if 1st num and op only
+                if(/^[*/+-]?$/.test(objResult.textContent.at(-2))) {
+                    break;
+                }
+
                 // Valid input/s if 1st num only OR 1st num, op, and 2nd num
-                if(!(objResult.textContent === '')) {
+                if(objResult.textContent !== '') {
                     objResult.textContent = storeValues();
                     boolHasOp = false;
                 }
@@ -105,13 +133,19 @@ objBtns.forEach(objBtn => {
             case '*':
             case '/':
                 // Invalid 1st input num '.'
-                if(objResult.textContent === '.') {
+                if(objResult.textContent.at(-1) === '.') {
+                    break;
+                }
+
+                // Invalid if unary only before op
+                if(/^[+-]?$/.test(objResult.textContent)) {
                     break;
                 }
 
                 // Evaluate initial pair of nums
                 if(boolHasOp) {
                     objResult.textContent = storeValues();
+                    boolHasOp = false;
                 }
 
                 objResult.textContent += ` ${charInput} `;
