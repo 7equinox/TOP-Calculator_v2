@@ -53,11 +53,20 @@ function storeValues() {
     const arrCalcInputs = objResult.textContent.split(' ');
 
     const num1 = parseFloat(arrCalcInputs[0]);
-    const operator = arrCalcInputs[1];
+
+    // Input has only one number w/o op
+    if(arrCalcInputs.length === 1) {
+        return num1;
+    }
+
     const num2 = parseFloat(arrCalcInputs[2]);
-    console.log(num1);
-    console.log(operator);
-    console.log(num2);
+
+    // Input has one num & one op w/o second num
+    if(Number.isNaN(num2)) {
+        return num1;
+    }
+    
+    const operator = arrCalcInputs[1];
 
     return getFinalValue(num1, operator, num2);
 }
@@ -68,21 +77,43 @@ objBtns.forEach(objBtn => {
         const charInput = objBtn.textContent;
 
         switch(charInput) {
+            // Clear button
             case 'C':
                 objResult.textContent = '';
                 boolHasOp = false;
                 break;
             case '=':
-                objResult.textContent = storeValues();
-                boolHasOp = false;
+                // Invalid 2nd input num '.'
+                if(objResult.textContent.at(-1) === '.') {
+                    break;
+                }
+
+                // Valid input/s if 1st num only OR 1st num, op, and 2nd num
+                if(!(objResult.textContent === '')) {
+                    objResult.textContent = storeValues();
+                    boolHasOp = false;
+                }
                 break;
             case '+':
             case '-':
+                // Unary operator of a num
+                if(/^[+-]?$/.test(objResult.textContent)) {
+                    objResult.textContent = charInput;
+                    break;
+                }
+                
             case '*':
             case '/':
+                // Invalid 1st input num '.'
+                if(objResult.textContent === '.') {
+                    break;
+                }
+
+                // Evaluate initial pair of nums
                 if(boolHasOp) {
                     objResult.textContent = storeValues();
                 }
+
                 objResult.textContent += ` ${charInput} `;
                 boolHasOp = true;
                 break;
