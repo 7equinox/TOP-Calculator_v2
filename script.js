@@ -1,6 +1,4 @@
-let num1 = 0;
-let operator = '';
-let num2 = 0;
+let boolHasOp = false;
 
 const objResult = document.querySelector('.result');
 const objBtns = document.querySelectorAll('button');
@@ -37,6 +35,34 @@ function operate(num1, operator, num2) {
     }
 }
 
+function hasAtMostTwoDecimals(fltNum) {
+    return /^\d+\.\d{1,2}$/.test(fltNum.toString());
+}
+
+function getFinalValue(num1, operator, num2) {
+    const calcAns = operate(num1, operator, num2);
+
+    // Round answer to not overflow the display
+    if(!hasAtMostTwoDecimals(calcAns)) {
+        return parseFloat(calcAns.toFixed(2));
+    }
+    return calcAns;
+}
+
+function storeValues() {
+    const arrCalcInputs = objResult.textContent.split(' ');
+
+    const num1 = parseFloat(arrCalcInputs[0]);
+    const operator = arrCalcInputs[1];
+    const num2 = parseFloat(arrCalcInputs[2]);
+    console.log(num1);
+    console.log(operator);
+    console.log(num2);
+
+    return getFinalValue(num1, operator, num2);
+}
+
+// Listen what user clicks
 objBtns.forEach(objBtn => {
     objBtn.addEventListener('click', (event) => {
         const charInput = objBtn.textContent;
@@ -44,16 +70,21 @@ objBtns.forEach(objBtn => {
         switch(charInput) {
             case 'C':
                 objResult.textContent = '';
+                boolHasOp = false;
                 break;
             case '=':
-                const arrCalcInputs = objResult.textContent.split(' ');
-                objResult.textContent = operate(...arrCalcInputs);
+                objResult.textContent = storeValues();
+                boolHasOp = false;
                 break;
             case '+':
             case '-':
             case '*':
             case '/':
+                if(boolHasOp) {
+                    objResult.textContent = storeValues();
+                }
                 objResult.textContent += ` ${charInput} `;
+                boolHasOp = true;
                 break;
             default:
                 objResult.textContent += charInput;
