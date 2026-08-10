@@ -105,6 +105,22 @@ objBtns.forEach(objBtn => {
                 boolHasOp = false;
                 boolHasDeci = false;
                 break;
+            // Backspace button
+            case '⌫':
+                // Clear if operation complete
+                if(boolHasCompleteOp) {
+                    objResult.textContent = '';
+                    break;
+                }
+                // Remove space if last input is op
+                if(/^[*/+-]?$/.test(objResult.textContent.at(-2))) {
+                    objResult.textContent =
+                        objResult.textContent
+                        .replaceAll(' ', '');
+                }
+                objResult.textContent =
+                    objResult.textContent.slice(0, -1);
+                break;
             case '=':
                 // Invalid 1st or 2nd input num '.'
                 if(objResult.textContent.at(-1) === '.') {

@@ -37,7 +37,7 @@ body {
     width: auto;
     height: 554px;
     display: flex;
-    flex-wrap: wrap;
+    flex-wrap: wrap-reverse;
     justify-content: space-between;
     gap: 10px;
 }
@@ -55,6 +55,11 @@ button.op {
 
 button.clear {
     background-color: lightpink;
+}
+
+button.backspace {
+    font-size: 40px;
+    background-color: lightsalmon;
 }
 
 button:hover:not([disabled]) {
