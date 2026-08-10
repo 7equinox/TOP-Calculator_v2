@@ -3,6 +3,7 @@ let boolHasDeci = false;
 
 const objResult = document.querySelector('.result');
 const objBtns = document.querySelectorAll('button');
+const objDeciBtn = document.querySelector('.deci');
 
 function add(addend1, addend2) {
     return addend1 + addend2;
@@ -68,7 +69,7 @@ function storeValues() {
     const arrCalcInputs = objResult.textContent.split(' ');
 
     const num1 = parseFloat(arrCalcInputs[0]);
-
+    
     // Input has only one number w/o op
     if(arrCalcInputs.length === 1) {
         return num1;
@@ -124,7 +125,7 @@ objBtns.forEach(objBtn => {
                     objResult.textContent = storeValues();
                     boolHasOp = false;
                     // Eligible to add a decimal for integer output
-                    if(Number.isInteger(objResult.textContent)) {
+                    if(Number.isInteger(Number(objResult.textContent))) {
                         boolHasDeci = false;
                     }
                 }
@@ -167,6 +168,12 @@ objBtns.forEach(objBtn => {
                 boolHasDeci = true;
             default:
                 objResult.textContent += charInput;
+        }
+
+        if(boolHasDeci) {
+            objDeciBtn.disabled = true;
+        } else {
+            objDeciBtn.disabled = false;
         }
     });
 });

@@ -57,10 +57,14 @@ button.clear {
     background-color: lightpink;
 }
 
-button:hover {
+button:hover:not([disabled]) {
     background-color: lightyellow;
 }
 
-button:active {
+button:active:not([disabled]) {
     background-color: lightsalmon;
+}
+
+.deci:disabled {
+    cursor: not-allowed;
 }
