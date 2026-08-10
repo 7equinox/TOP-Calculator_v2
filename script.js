@@ -1,4 +1,5 @@
 let boolHasOp = false;
+let boolHasDeci = false;
 
 const objResult = document.querySelector('.result');
 const objBtns = document.querySelectorAll('button');
@@ -18,6 +19,7 @@ function multiply(multiplicand, multiplier) {
 function divide(dividend, divisor) {
     const quotient = dividend / divisor;
 
+    // Invalid for any number divided by 0
     if(quotient === Infinity
         || quotient === -Infinity
         || Number.isNaN(quotient)) {
@@ -99,6 +101,7 @@ objBtns.forEach(objBtn => {
             case 'C':
                 objResult.textContent = '';
                 boolHasOp = false;
+                boolHasDeci = false;
                 break;
             case '=':
                 // Invalid 1st or 2nd input num '.'
@@ -120,6 +123,10 @@ objBtns.forEach(objBtn => {
                 if(objResult.textContent !== '') {
                     objResult.textContent = storeValues();
                     boolHasOp = false;
+                    // Eligible to add a decimal for integer output
+                    if(Number.isInteger(objResult.textContent)) {
+                        boolHasDeci = false;
+                    }
                 }
                 break;
             case '+':
@@ -150,7 +157,14 @@ objBtns.forEach(objBtn => {
 
                 objResult.textContent += ` ${charInput} `;
                 boolHasOp = true;
+                boolHasDeci = false;
                 break;
+            case '.':
+                // One decimal is allowed per input num
+                if(boolHasDeci) {
+                    break;
+                }
+                boolHasDeci = true;
             default:
                 objResult.textContent += charInput;
         }
