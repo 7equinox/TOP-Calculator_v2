@@ -1,5 +1,6 @@
 let boolHasOp = false;
 let boolHasDeci = false;
+let boolHasCompleteOp = false;
 
 const objResult = document.querySelector('.result');
 const objBtns = document.querySelectorAll('button');
@@ -123,10 +124,16 @@ objBtns.forEach(objBtn => {
                 // Valid input/s if 1st num only OR 1st num, op, and 2nd num
                 if(objResult.textContent !== '') {
                     objResult.textContent = storeValues();
-                    boolHasOp = false;
+                    
                     // Eligible to add a decimal for integer output
                     if(Number.isInteger(Number(objResult.textContent))) {
                         boolHasDeci = false;
+                    }
+
+                    // Signal for add operation or start new calc after result
+                    if(boolHasOp) {
+                        boolHasOp = false;
+                        boolHasCompleteOp = true;
                     }
                 }
                 break;
@@ -167,9 +174,15 @@ objBtns.forEach(objBtn => {
                 }
                 boolHasDeci = true;
             default:
+                // Start new calculation after result
+                if(boolHasCompleteOp && !boolHasOp) {
+                    boolHasCompleteOp = false;
+                    objResult.textContent = '';
+                }
                 objResult.textContent += charInput;
         }
 
+        // One decimal for float num
         if(boolHasDeci) {
             objDeciBtn.disabled = true;
         } else {
