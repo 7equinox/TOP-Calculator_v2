@@ -31,10 +31,6 @@ function isInputUnaryOpOnly(strCalcInput) {
     return /^[+-]?$/.test(strCalcInput);
 }
 
-function isInputNumAndOpOnly(strCalcInput) {
-    return /^[*/+-]?$/.test(strCalcInput.at(-2));
-}
-
 function isStartNewCalc() {
     return objBool.hasCompleteOp
         && !objBool.hasOp;
@@ -49,7 +45,7 @@ function toggleDeciBtn() {
     }
 }
 
-function isValidExpression(arrCalcInputs) {
+function isValidInputs(arrCalcInputs) {
     return arrCalcInputs.length === 3;
 }
 
@@ -125,7 +121,7 @@ function manageCalcValues() {
     const num1 = parseFloat(arrCalcInputs[0]);
     
     // Expression consist of only a num
-    if(!isValidExpression(arrCalcInputs)) {
+    if(!isValidInputs(arrCalcInputs)) {
         return num1;
     }
 
@@ -158,10 +154,10 @@ function backspaceCalcInput() {
 }
 
 function enterCalcInput() {
-    if(isAnswerUndefined(objResult.textContent) ||
-        isInputPeriodOnly(objResult.textContent) ||
-        isInputUnaryOpOnly(objResult.textContent) ||
-        isInputNumAndOpOnly(objResult.textContent)) {
+    if(isAnswerUndefined(objResult.textContent)
+        || isInputPeriodOnly(objResult.textContent)
+        || isInputUnaryOpOnly(objResult.textContent)
+        || isOperatorLastInput(objResult.textContent)) {
         return;
     }
 
@@ -188,6 +184,11 @@ function operatorCalcInput(charInput) {
         isInputPeriodOnly(objResult.textContent) ||
         isInputUnaryOpOnly(objResult.textContent)) {
         return;
+    }
+
+    // Change operator
+    if(isOperatorLastInput(objResult.textContent)) {
+        backspaceCalcInput();
     }
 
     // Evaluate initial pair of nums
