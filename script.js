@@ -6,10 +6,30 @@ const objResult = document.querySelector('.result');
 const objBtns = document.querySelectorAll('button');
 const objDeciBtn = document.querySelector('.deci');
 
+function isInputEmpty(strCalcInput) {
+    return strCalcInput === '';
+}
+
+function isOperatorLastInput(strCalcInput) {
+    return /^[*/+-]?$/.test(strCalcInput.at(-2));
+}
+
+function getLastInputIdx(strCalcInput) {
+    if(isOperatorLastInput(strCalcInput)) {
+        return -3;
+    }
+    return -1;
+}
+
+function isValidExpression(arrCalcInputs) {
+    return arrCalcInputs.length === 3;
+}
+
 function isAnswerUndefined(quotient) {
     return quotient === Infinity
         || quotient === -Infinity
-        || Number.isNaN(quotient);
+        || Number.isNaN(quotient)
+        || quotient === 'undefined';
 }
 
 function hasAtLeastThreeDecimals(fltNum) {
@@ -17,7 +37,7 @@ function hasAtLeastThreeDecimals(fltNum) {
 }
 
 function setTwoDecimalPlaces(fltLongNum) {
-    return parseFloat(calcAns.toFixed(2));
+    return parseFloat(fltLongNum.toFixed(2));
 }
 
 function add(addend1, addend2) {
@@ -67,40 +87,56 @@ function getCalcOutput(num1, operator, num2) {
     return calcAns;
 }
 
-function storeValues() {
+function manageCalcValues() {
     const arrCalcInputs = objResult.textContent.split(' ');
 
     const num1 = parseFloat(arrCalcInputs[0]);
     
-    // Input has only one number w/o op
-    if(arrCalcInputs.length === 1) {
+    // Expression consist of only a num
+    if(!isValidExpression(arrCalcInputs)) {
         return num1;
     }
 
+    const operator = arrCalcInputs[1];
     const num2 = parseFloat(arrCalcInputs[2]);
 
-    // Input has one num & one op w/o second num
-    if(Number.isNaN(num2)) {
-        return num1;
-    }
-    
-    const operator = arrCalcInputs[1];
-
     return getCalcOutput(num1, operator, num2);
+}
+
+function clearCalcInput() {
+    objResult.textContent = '';
+    boolHasOp = false;
+    boolHasDeci = false;
+}
+
+function backspaceCalcInput() {
+    // Clear if operation complete
+    if(boolHasCompleteOp) {
+        clearCalcInput();
+        return;
+    }
+
+    let strCalcInput = objResult.textContent;
+
+    // Empty display
+    if(isInputEmpty(strCalcInput)) {
+        return;
+    }
+
+    const intEndIdx = getLastInputIdx(strCalcInput);
+    objResult.textContent = strCalcInput.slice(0, intEndIdx);
 }
 
 function setCalcInput(event) {
     let charInput = '';
 
+    // Clicks any calc btn
     if(event.type === 'click') {
         charInput = event.target.textContent;
-    } else {
-        charInput = event.key;
     }
-
-    // Avoid NaN immediately
-    if(objResult.textContent === 'undefined') {
-        objResult.textContent = '';
+    // Types from a keyboard
+    else {
+        charInput = event.key;
     }
 
     switch(charInput) {
@@ -108,29 +144,19 @@ function setCalcInput(event) {
         case 'C':
         case 'c':
         case 'Delete':
-            objResult.textContent = '';
-            boolHasOp = false;
-            boolHasDeci = false;
+            clearCalcInput();
             break;
         // Backspace button
         case '⌫':
         case 'Backspace':
-            // Clear if operation complete
-            if(boolHasCompleteOp) {
-                objResult.textContent = '';
-                break;
-            }
-            // Remove space if last input is op
-            if(/^[*/+-]?$/.test(objResult.textContent.at(-2))) {
-                objResult.textContent =
-                    objResult.textContent
-                    .replaceAll(' ', '');
-            }
-            objResult.textContent =
-                objResult.textContent.slice(0, -1);
+            backspaceCalcInput();
             break;
         case '=':
         case 'Enter':
+            if(isAnswerUndefined(objResult.textContent)) {
+                break;
+            }
+
             // Invalid 1st or 2nd input num '.'
             if(objResult.textContent.at(-1) === '.') {
                 break;
@@ -148,7 +174,7 @@ function setCalcInput(event) {
 
             // Valid input/s if 1st num only OR 1st num, op, and 2nd num
             if(objResult.textContent !== '') {
-                objResult.textContent = storeValues();
+                objResult.textContent = manageCalcValues();
 
                 // Indeterminate answer
                 if(objResult.textContent === 'undefined') {
@@ -177,6 +203,10 @@ function setCalcInput(event) {
             
         case '*':
         case '/':
+            if(isAnswerUndefined(objResult.textContent)) {
+                break;
+            }
+
             // Invalid 1st input num '.'
             if(objResult.textContent.at(-1) === '.') {
                 break;
@@ -189,7 +219,7 @@ function setCalcInput(event) {
 
             // Evaluate initial pair of nums
             if(boolHasOp) {
-                objResult.textContent = storeValues();
+                objResult.textContent = manageCalcValues();
                 
                 // Indeterminate answer
                 if(objResult.textContent === 'undefined') {
