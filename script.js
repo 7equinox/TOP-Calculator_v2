@@ -6,6 +6,12 @@ const objResult = document.querySelector('.result');
 const objBtns = document.querySelectorAll('button');
 const objDeciBtn = document.querySelector('.deci');
 
+function isQuotientUndefined(quotient) {
+    return quotient === Infinity
+        || quotient === -Infinity
+        || Number.isNaN(quotient);
+}
+
 function add(addend1, addend2) {
     return addend1 + addend2;
 }
@@ -21,10 +27,7 @@ function multiply(multiplicand, multiplier) {
 function divide(dividend, divisor) {
     const quotient = dividend / divisor;
 
-    // Invalid for any number divided by 0
-    if(quotient === Infinity
-        || quotient === -Infinity
-        || Number.isNaN(quotient)) {
+    if(isQuotientUndefined(quotient)) {
         return "undefined";
     }
     return quotient;
