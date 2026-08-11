@@ -167,6 +167,29 @@ function enterCalcInput() {
     }
 }
 
+function operatorCalcInput() {
+    if(isAnswerUndefined(objResult.textContent) ||
+        isInputPeriodOnly(objResult.textContent) ||
+        isInputUnaryOpOnly(objResult.textContent)) {
+        return;
+    }
+
+    // Evaluate initial pair of nums
+    if(boolHasOp) {
+        objResult.textContent = manageCalcValues();
+        
+        if(isAnswerUndefined(objResult.textContent)) {
+            alert("Division by zero is undefined");
+        }
+
+        boolHasOp = false;
+    }
+
+    objResult.textContent += ` ${charInput} `;
+    boolHasOp = true;
+    boolHasDeci = false;
+}
+
 function setCalcInput(event) {
     let charInput = '';
 
@@ -191,49 +214,22 @@ function setCalcInput(event) {
         case 'Backspace':
             backspaceCalcInput();
             break;
+        // Result button
         case '=':
         case 'Enter':
             enterCalcInput();
             break;
+        // Unary or Operator buttons
         case '+':
         case '-':
-            // Unary operator of a num
             if(isInputUnaryOpOnly(objResult.textContent)) {
                 objResult.textContent = charInput;
                 break;
             }
-            
+        // Operator buttons
         case '*':
         case '/':
-            if(isAnswerUndefined(objResult.textContent)) {
-                break;
-            }
-
-            // Invalid 1st input num '.'
-            if(isInputPeriodOnly(objResult.textContent)) {
-                break;
-            }
-
-            // Invalid if unary only before op
-            if(isInputUnaryOpOnly(objResult.textContent)) {
-                break;
-            }
-
-            // Evaluate initial pair of nums
-            if(boolHasOp) {
-                objResult.textContent = manageCalcValues();
-                
-                // Indeterminate answer
-                if(objResult.textContent === 'undefined') {
-                    alert("Division by zero is undefined");
-                }
-
-                boolHasOp = false;
-            }
-
-            objResult.textContent += ` ${charInput} `;
-            boolHasOp = true;
-            boolHasDeci = false;
+            operatorCalcInput();
             break;
         case '.':
             // One decimal is allowed per input num
