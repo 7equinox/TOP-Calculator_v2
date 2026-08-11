@@ -21,6 +21,18 @@ function getLastInputIdx(strCalcInput) {
     return -1;
 }
 
+function isInputPeriodOnly(strCalcInput) {
+    return strCalcInput.at(-1) === '.';
+}
+
+function isInputUnaryOpOnly(strCalcInput) {
+    return /^[+-]?$/.test(strCalcInput);
+}
+
+function isInputNumAndOpOnly(strCalcInput) {
+    return /^[*/+-]?$/.test(strCalcInput.at(-2));
+}
+
 function isValidExpression(arrCalcInputs) {
     return arrCalcInputs.length === 3;
 }
@@ -30,6 +42,10 @@ function isAnswerUndefined(quotient) {
         || quotient === -Infinity
         || Number.isNaN(quotient)
         || quotient === 'undefined';
+}
+
+function isWholeNumber() {
+    return Number.isInteger(Number(objResult.textContent));
 }
 
 function hasAtLeastThreeDecimals(fltNum) {
@@ -110,21 +126,45 @@ function clearCalcInput() {
 }
 
 function backspaceCalcInput() {
+    // Empty display
+    if(isInputEmpty(objResult.textContent)) {
+        return;
+    }
+
     // Clear if operation complete
     if(boolHasCompleteOp) {
         clearCalcInput();
         return;
     }
 
-    let strCalcInput = objResult.textContent;
+    const intEndIdx = getLastInputIdx(objResult.textContent);
+    objResult.textContent = objResult.textContent.slice(0, intEndIdx);
+}
 
-    // Empty display
-    if(isInputEmpty(strCalcInput)) {
+function enterCalcInput() {
+    if(isAnswerUndefined(objResult.textContent) ||
+        isInputPeriodOnly(objResult.textContent) ||
+        isInputUnaryOpOnly(objResult.textContent) ||
+        isInputNumAndOpOnly(objResult.textContent)) {
         return;
     }
 
-    const intEndIdx = getLastInputIdx(strCalcInput);
-    objResult.textContent = strCalcInput.slice(0, intEndIdx);
+    objResult.textContent = manageCalcValues();
+
+    if(isAnswerUndefined(objResult.textContent)) {
+        alert("Division by zero is undefined");
+    }
+        
+    // Eligible to add a decimal for integer output
+    if(isWholeNumber()) {
+        boolHasDeci = false;
+    }
+
+    // Signal for add operation or start new calc after result
+    if(boolHasOp) {
+        boolHasOp = false;
+        boolHasCompleteOp = true;
+    }
 }
 
 function setCalcInput(event) {
@@ -153,50 +193,12 @@ function setCalcInput(event) {
             break;
         case '=':
         case 'Enter':
-            if(isAnswerUndefined(objResult.textContent)) {
-                break;
-            }
-
-            // Invalid 1st or 2nd input num '.'
-            if(objResult.textContent.at(-1) === '.') {
-                break;
-            }
-
-            // Invalid unary op
-            if(/^[+-]?$/.test(objResult.textContent)) {
-                break;
-            }
-
-            // Invalid inputs if 1st num and op only
-            if(/^[*/+-]?$/.test(objResult.textContent.at(-2))) {
-                break;
-            }
-
-            // Valid input/s if 1st num only OR 1st num, op, and 2nd num
-            if(objResult.textContent !== '') {
-                objResult.textContent = manageCalcValues();
-
-                // Indeterminate answer
-                if(objResult.textContent === 'undefined') {
-                    alert("Division by zero is undefined");
-                }
-                 
-                // Eligible to add a decimal for integer output
-                if(Number.isInteger(Number(objResult.textContent))) {
-                    boolHasDeci = false;
-                }
-
-                // Signal for add operation or start new calc after result
-                if(boolHasOp) {
-                    boolHasOp = false;
-                    boolHasCompleteOp = true;
-                }
-            }
+            enterCalcInput();
             break;
         case '+':
         case '-':
             // Unary operator of a num
-            if(/^[+-]?$/.test(objResult.textContent)) {
+            if(isInputUnaryOpOnly(objResult.textContent)) {
                 objResult.textContent = charInput;
                 break;
             }
@@ -208,12 +210,12 @@ function setCalcInput(event) {
             }
 
             // Invalid 1st input num '.'
-            if(objResult.textContent.at(-1) === '.') {
+            if(isInputPeriodOnly(objResult.textContent)) {
                 break;
             }
 
             // Invalid if unary only before op
-            if(/^[+-]?$/.test(objResult.textContent)) {
+            if(isInputUnaryOpOnly(objResult.textContent)) {
                 break;
             }
 
