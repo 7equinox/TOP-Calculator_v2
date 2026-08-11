@@ -38,6 +38,15 @@ function isStartNewCalc() {
         && !boolHasOp;
 }
 
+// One decimal for float num
+function toggleDeciBtn() {
+    if(boolHasDeci) {
+        objDeciBtn.disabled = true;
+    } else {
+        objDeciBtn.disabled = false;
+    }
+}
+
 function isValidExpression(arrCalcInputs) {
     return arrCalcInputs.length === 3;
 }
@@ -265,12 +274,7 @@ function setCalcInput(event) {
             numberCalcInput();
     }
 
-    // One decimal for float num
-    if(boolHasDeci) {
-        objDeciBtn.disabled = true;
-    } else {
-        objDeciBtn.disabled = false;
-    }
+    toggleDeciBtn();
 }
 
 // Listen what user clicks
