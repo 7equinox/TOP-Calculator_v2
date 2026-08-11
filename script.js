@@ -33,6 +33,11 @@ function isInputNumAndOpOnly(strCalcInput) {
     return /^[*/+-]?$/.test(strCalcInput.at(-2));
 }
 
+function isStartNewCalc() {
+    return boolHasCompleteOp
+        && !boolHasOp;
+}
+
 function isValidExpression(arrCalcInputs) {
     return arrCalcInputs.length === 3;
 }
@@ -190,6 +195,14 @@ function operatorCalcInput() {
     boolHasDeci = false;
 }
 
+function numberCalcInput() {
+    if(isStartNewCalc()) {
+        boolHasCompleteOp = false;
+        objResult.textContent = '';
+    }
+    objResult.textContent += charInput;
+}
+
 function setCalcInput(event) {
     let charInput = '';
 
@@ -231,12 +244,14 @@ function setCalcInput(event) {
         case '/':
             operatorCalcInput();
             break;
+        // Decimal button
         case '.':
             // One decimal is allowed per input num
             if(boolHasDeci) {
                 break;
             }
             boolHasDeci = true;
+        // Number buttons
         case '0':
         case '1':
         case '2':
@@ -247,12 +262,7 @@ function setCalcInput(event) {
         case '7':
         case '8':
         case '9':
-            // Start new calculation after result
-            if(boolHasCompleteOp && !boolHasOp) {
-                boolHasCompleteOp = false;
-                objResult.textContent = '';
-            }
-            objResult.textContent += charInput;
+            numberCalcInput();
     }
 
     // One decimal for float num
