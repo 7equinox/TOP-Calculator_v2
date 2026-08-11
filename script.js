@@ -1,6 +1,8 @@
-let boolHasOp = false;
-let boolHasDeci = false;
-let boolHasCompleteOp = false;
+const objBool = {
+    hasOp: false,
+    hasDeci: false,
+    hasCompleteOp: false
+};
 
 const objResult = document.querySelector('.result');
 const objBtns = document.querySelectorAll('button');
@@ -34,13 +36,13 @@ function isInputNumAndOpOnly(strCalcInput) {
 }
 
 function isStartNewCalc() {
-    return boolHasCompleteOp
-        && !boolHasOp;
+    return objBool.hasCompleteOp
+        && !objBool.hasOp;
 }
 
 // One decimal for float num
 function toggleDeciBtn() {
-    if(boolHasDeci) {
+    if(objBool.hasDeci) {
         objDeciBtn.disabled = true;
     } else {
         objDeciBtn.disabled = false;
@@ -135,8 +137,8 @@ function manageCalcValues() {
 
 function clearCalcInput() {
     objResult.textContent = '';
-    boolHasOp = false;
-    boolHasDeci = false;
+    objBool.hasOp = false;
+    objBool.hasDeci = false;
 }
 
 function backspaceCalcInput() {
@@ -146,7 +148,7 @@ function backspaceCalcInput() {
     }
 
     // Clear if operation complete
-    if(boolHasCompleteOp) {
+    if(objBool.hasCompleteOp) {
         clearCalcInput();
         return;
     }
@@ -171,17 +173,17 @@ function enterCalcInput() {
         
     // Eligible to add a decimal for integer output
     if(isWholeNumber()) {
-        boolHasDeci = false;
+        objBool.hasDeci = false;
     }
 
     // Signal for add operation or start new calc after result
-    if(boolHasOp) {
-        boolHasOp = false;
-        boolHasCompleteOp = true;
+    if(objBool.hasOp) {
+        objBool.hasOp = false;
+        objBool.hasCompleteOp = true;
     }
 }
 
-function operatorCalcInput() {
+function operatorCalcInput(charInput) {
     if(isAnswerUndefined(objResult.textContent) ||
         isInputPeriodOnly(objResult.textContent) ||
         isInputUnaryOpOnly(objResult.textContent)) {
@@ -189,24 +191,24 @@ function operatorCalcInput() {
     }
 
     // Evaluate initial pair of nums
-    if(boolHasOp) {
+    if(objBool.hasOp) {
         objResult.textContent = manageCalcValues();
         
         if(isAnswerUndefined(objResult.textContent)) {
             alert("Division by zero is undefined");
         }
 
-        boolHasOp = false;
+        objBool.hasOp = false;
     }
 
     objResult.textContent += ` ${charInput} `;
-    boolHasOp = true;
-    boolHasDeci = false;
+    objBool.hasOp = true;
+    objBool.hasDeci = false;
 }
 
-function numberCalcInput() {
+function numberCalcInput(charInput) {
     if(isStartNewCalc()) {
-        boolHasCompleteOp = false;
+        objBool.hasCompleteOp = false;
         objResult.textContent = '';
     }
     objResult.textContent += charInput;
@@ -251,15 +253,15 @@ function setCalcInput(event) {
         // Operator buttons
         case '*':
         case '/':
-            operatorCalcInput();
+            operatorCalcInput(charInput);
             break;
         // Decimal button
         case '.':
             // One decimal is allowed per input num
-            if(boolHasDeci) {
+            if(objBool.hasDeci) {
                 break;
             }
-            boolHasDeci = true;
+            objBool.hasDeci = true;
         // Number buttons
         case '0':
         case '1':
@@ -271,7 +273,7 @@ function setCalcInput(event) {
         case '7':
         case '8':
         case '9':
-            numberCalcInput();
+            numberCalcInput(charInput);
     }
 
     toggleDeciBtn();
