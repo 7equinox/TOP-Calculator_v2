@@ -6,10 +6,18 @@ const objResult = document.querySelector('.result');
 const objBtns = document.querySelectorAll('button');
 const objDeciBtn = document.querySelector('.deci');
 
-function isQuotientUndefined(quotient) {
+function isAnswerUndefined(quotient) {
     return quotient === Infinity
         || quotient === -Infinity
         || Number.isNaN(quotient);
+}
+
+function hasAtLeastThreeDecimals(fltNum) {
+    return /^\d+\.\d{3,}$/.test(fltNum.toString());
+}
+
+function setTwoDecimalPlaces(fltLongNum) {
+    return parseFloat(calcAns.toFixed(2));
 }
 
 function add(addend1, addend2) {
@@ -25,12 +33,7 @@ function multiply(multiplicand, multiplier) {
 }
 
 function divide(dividend, divisor) {
-    const quotient = dividend / divisor;
-
-    if(isQuotientUndefined(quotient)) {
-        return "undefined";
-    }
-    return quotient;
+    return dividend / divisor;
 }
 
 function operate(num1, operator, num2) {
@@ -49,21 +52,16 @@ function operate(num1, operator, num2) {
     }
 }
 
-function hasAtMostTwoDecimals(fltNum) {
-    return /^\d+\.\d{1,2}$/.test(fltNum.toString());
-}
-
-function getFinalValue(num1, operator, num2) {
+function getCalcOutput(num1, operator, num2) {
     const calcAns = operate(num1, operator, num2);
 
-    // Round answer to not overflow the display
-    if(calcAns !== "undefined" && !hasAtMostTwoDecimals(calcAns)) {
-        return parseFloat(calcAns.toFixed(2));
+    if(isAnswerUndefined(calcAns)) {
+        return "undefined";
     }
 
-    // Remind if divisor is zero
-    if(calcAns === "undefined") {
-        alert("Division by zero is undefined");
+    // Don't overflow the result
+    if(hasAtLeastThreeDecimals(calcAns)) {
+        return setTwoDecimalPlaces(calcAns);
     }
 
     return calcAns;
@@ -88,7 +86,7 @@ function storeValues() {
     
     const operator = arrCalcInputs[1];
 
-    return getFinalValue(num1, operator, num2);
+    return getCalcOutput(num1, operator, num2);
 }
 
 function setCalcInput(event) {
@@ -151,7 +149,12 @@ function setCalcInput(event) {
             // Valid input/s if 1st num only OR 1st num, op, and 2nd num
             if(objResult.textContent !== '') {
                 objResult.textContent = storeValues();
-                
+
+                // Indeterminate answer
+                if(objResult.textContent === 'undefined') {
+                    alert("Division by zero is undefined");
+                }
+                 
                 // Eligible to add a decimal for integer output
                 if(Number.isInteger(Number(objResult.textContent))) {
                     boolHasDeci = false;
@@ -187,6 +190,12 @@ function setCalcInput(event) {
             // Evaluate initial pair of nums
             if(boolHasOp) {
                 objResult.textContent = storeValues();
+                
+                // Indeterminate answer
+                if(objResult.textContent === 'undefined') {
+                    alert("Division by zero is undefined");
+                }
+
                 boolHasOp = false;
             }
 
