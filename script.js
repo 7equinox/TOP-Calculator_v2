@@ -46,6 +46,12 @@ function toggleDeciBtn() {
     }
 }
 
+function focusDisplayInput() {
+    setTimeout(() => {
+        objResult.scrollLeft = objResult.scrollWidth;
+    }, 0);
+}
+
 function isValidInputs(arrCalcInputs) {
     return arrCalcInputs.length === 3;
 }
@@ -118,7 +124,6 @@ function getCalcOutput(num1, operator, num2) {
 
 function manageCalcValues() {
     const arrCalcInputs = objResult.textContent.split(' ');
-    console.log(arrCalcInputs);
     const num1 = parseFloat(arrCalcInputs[0]);
     
     // Expression consist of only a num
@@ -286,6 +291,7 @@ function setCalcInput(event) {
     }
 
     toggleDeciBtn();
+    focusDisplayInput();
 }
 
 // Listen what user clicks
