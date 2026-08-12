@@ -33,7 +33,8 @@ function isInputUnaryOpOnly(strCalcInput) {
 
 function isStartNewCalc() {
     return objBool.hasCompleteOp
-        && !objBool.hasOp;
+        && !objBool.hasOp
+        && !isInputUnaryOpOnly(objResult.textContent);
 }
 
 // One decimal for float num
@@ -117,7 +118,7 @@ function getCalcOutput(num1, operator, num2) {
 
 function manageCalcValues() {
     const arrCalcInputs = objResult.textContent.split(' ');
-
+    console.log(arrCalcInputs);
     const num1 = parseFloat(arrCalcInputs[0]);
     
     // Expression consist of only a num
@@ -135,6 +136,7 @@ function clearCalcInput() {
     objResult.textContent = '';
     objBool.hasOp = false;
     objBool.hasDeci = false;
+    objBool.hasCompleteOp = false;
 }
 
 function backspaceCalcInput() {
@@ -151,6 +153,11 @@ function backspaceCalcInput() {
 
     const intEndIdx = getLastInputIdx(objResult.textContent);
     objResult.textContent = objResult.textContent.slice(0, intEndIdx);
+
+    // New display is empty
+    if(isInputEmpty(objResult.textContent)) {
+        clearCalcInput();
+    }
 }
 
 function enterCalcInput() {
@@ -187,7 +194,8 @@ function operatorCalcInput(charInput) {
     }
 
     // Change operator
-    if(isOperatorLastInput(objResult.textContent)) {
+    if(objBool.hasOp &&
+        isOperatorLastInput(objResult.textContent)) {
         backspaceCalcInput();
     }
 
@@ -209,7 +217,6 @@ function operatorCalcInput(charInput) {
 
 function numberCalcInput(charInput) {
     if(isStartNewCalc()) {
-        objBool.hasCompleteOp = false;
         objResult.textContent = '';
     }
     objResult.textContent += charInput;
@@ -232,6 +239,7 @@ function setCalcInput(event) {
         case 'C':
         case 'c':
         case 'Delete':
+        case 'Escape':
             clearCalcInput();
             break;
         // Backspace button
